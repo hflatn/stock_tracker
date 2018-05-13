@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import login from './login.css';
+
 
 class log extends Component {
     constructor(props){
@@ -13,19 +13,18 @@ class log extends Component {
         
 
         return ( 
-            <div className = 'login-background' >
+            <div className = 'login' >
 
                
-                <span className = 'login-title'> Stock Tracker </span> 
+                <span className = 'title'> Stock Tracker </span> 
                 
 
                 
-                <span className = 'login-description'> Manage your portfolio anywhere and everywhere </span>
+                <span className = 'description'> Manage your portfolio anywhere and everywhere </span>
 
-                <div className ='login-title'>
-                 <a className = 'login-register-button' href="http://localhost:3111/auth/callback"> Login / Register  </a> 
+                <div className ='title'>
+                 <a className = 'register-button' href={process.env.REACT_APP_LOGIN}> Login / Register  </a> 
                 </div>
-
                 </div>
         )
     }

@@ -1,0 +1,123 @@
+@import url("https://fonts.googleapis.com/css?family=Abril+Fatface|Vollkorn");
+
+
+
+@media only screen and (max-width: 600px) and (max-height: 900px) {
+
+    %description {
+        font-size: 24px;
+        font-family: 'Vollkorn'
+    }
+    
+    .home {
+        
+        height: 100vh;
+        width: 100vw;
+        
+        .title {
+            font-size: 32px;
+            font-family: 'Abril Flatface';
+            font-weight: 700;
+        }
+
+
+        .top {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        height: 10%;
+        width: 100%;
+        box-shadow:  5px 10px
+        rgba(0, 0, 0, 0.014), 0 2px 2px 0
+        rgba(0, 0, 0, 0.932);
+
+        background-color: #F4F4F4;
+    }
+
+    .tip {
+    display: flex;
+    height: 15%;
+    width: 100%;
+    background-color: #F4F4F4;
+    justify-content: center;
+    }
+
+    .main {
+        flex-wrap: wrap;
+        height: 65%;
+        width: 100%;
+        background-color: #F4F4F4;
+    }
+
+    .addstock {
+        @extend %description;
+        height: 50%;
+        width: 50%;
+        padding: 0;
+        border: none;
+        background: none;
+        margin: 20px 20px 20px 0px;
+        display: flex; 
+        justify-content: center;
+        align-items: center;
+    }
+
+    .addbutton {
+    margin: 20px;
+    height: 50%;
+    width: 12%;
+    background-color: #77C9D4;
+    border: 1px solid #77C9D4;
+    color: black;
+    font-size: 24px;
+    text-decoration: none;
+    opacity: .9;
+    border-radius: 3px;
+    }
+
+    .viewListContainer{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height:10%;
+        width:100%;
+    }
+
+    .viewList {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height:100%;
+        width: 40%;
+        background: green;
+        margin: 10px
+    }
+
+    .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        height: 10%;
+        width: 100%; 
+        background-color: #373737;
+    }
+
+    .stockBoxContainer{ 
+        height:15%;
+        width: 100%;
+    }
+
+    .stockBox {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height:100%;
+        width: 80%;
+        margin-right: 10%;
+        box-shadow:  5px 10px
+        rgba(0, 0, 0, 0.014), 0 2px 2px 0
+        rgba(0, 0, 0, 0.932);
+
+    }
+}
+}

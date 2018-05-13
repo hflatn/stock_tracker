@@ -1,3 +1,4 @@
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const massive = require('massive');
@@ -10,6 +11,7 @@ require('dotenv').config()
 
 const app = express();
 
+app.use( express.static( `${__dirname}/build` ) );
 app.use( bodyParser.json() );
 
 massive( process.env.CONNECTION_STRING ).then ( db =>
@@ -20,7 +22,8 @@ massive( process.env.CONNECTION_STRING ).then ( db =>
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true,
+    cookie: { secure: false }
 }));
 
 app.use(passport.initialize())
@@ -54,18 +57,18 @@ passport.serializeUser( (user_id, done) => {
 
 passport.deserializeUser( (user_id, done) => {
     const db = app.get('db')
-
-    db.find_user([ user_id ]).then(( userbase ) => {
-        return done(null, userbase[0].user_id)
-    })
-     done(null, user_id)
+    done(null, user_id)
 })
 
 app.get('/auth', passport.authenticate('auth0'))
 app.get('/auth/callback', passport.authenticate('auth0', {
-    successRedirect: 'http://localhost:3000/#/dashboard',
-    failureRedirect: 'http://localhost:3000/#/'
+    successRedirect: process.env.SUCCESS_REDIRECT,
+    failureRedirect: process.env.FAILURE_REDIRECT
 }))
+
+app.get('/api/getstocks', controller.getstocks)
+app.post('/api/checkstock', controller.checkstock)
+app.post('/api/addstock', controller.addstock)
 
 const port =  3111
 app.listen( port, () => { console.log("Be-Booo-Booo-Bop...Server Online...Beep-Boop")})
