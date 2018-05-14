@@ -1,10 +1,12 @@
 const initialState = {
-userstockstring: '',
-userstockliststring: null
+userstockstring: null,
+userstockliststring: null,
+newquantitystring: null
 };
 
 const USERSTOCK = "USERSTOCK"
 const USERSTOCKLIST = "USERSTOCKLIST"
+const NEWQUANTITY = "NEWQUANTITY"
 
 export default function manager( state = initialState, action) {
     let { payload } = action;
@@ -19,7 +21,13 @@ export default function manager( state = initialState, action) {
             return Object.assign({}, state, {
                 userstockliststring: payload
             })
-    }}
+    
+        
+        case NEWQUANTITY: 
+            return Object.assign({}, state, {
+                newquantitystring: payload
+            })
+        }}
 
 export function userstock(userstockstring) {
     return {
@@ -32,5 +40,12 @@ export function userstocklist(userstockliststring){
     return {
         type: USERSTOCKLIST,
         payload: userstockliststring
+    }
+}
+
+export function newquantity(newquantitystring){
+    return {
+        type: NEWQUANTITY,
+        payload: newquantitystring
     }
 }

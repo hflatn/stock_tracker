@@ -69,6 +69,8 @@ app.get('/auth/callback', passport.authenticate('auth0', {
 app.get('/api/getstocks', controller.getstocks)
 app.post('/api/checkstock', controller.checkstock)
 app.post('/api/addstock', controller.addstock)
+app.patch('/api/updatestock', controller.updatestock)
+app.delete('/api/deletestock', controller.deletestock)
 
 const port =  3111
 app.listen( port, () => { console.log("Be-Booo-Booo-Bop...Server Online...Beep-Boop")})

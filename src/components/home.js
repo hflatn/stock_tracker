@@ -5,40 +5,66 @@ import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import IconButton from "material-ui/IconButton";
 import BotNav from "./botNav.js";
 import TopNav from "./topNav.js";
-import { userstock, userstocklist } from "./../reducer.js";
+import { userstock, userstocklist, newquantity } from "./../reducer.js";
+import { Pie } from 'react-chartjs-2';
 
 class home extends Component {
   constructor(props) {
     super(props);
     this.state = {
       tickerName: "",
-      tickerQuantity: []
+			tickerQuantity: [],
+			data: null
     };
   }
 
   componentDidMount() {
     axios.get("/api/getstocks").then(res => {
-        console.log(res.data, "user stock data");
-        this.props.userstock(res.data);
-        console.log(
-          this.props.userstockstring,
-          "whats in userstockstring didmount?"
-        );
-        const { userstockstring } = this.props;
-        let userSymbols = userstockstring.map(userstockstring => {
-          return userstockstring.symbol;
-        });
-        axios.get(`https://api.iextrading.com/1.0/stock/market/batch?types=quote,news&symbols=${userSymbols}`
-          ) 
-          .then(res => {
-            console.log(res.data, "whats in res.data?")
-      
-              var p = Object.entries(res.data)
+      console.log(res.data, "user stock data");
+      this.props.userstock(res.data);
+      console.log(
+        this.props.userstockstring,
+        "whats in userstockstring didmount?"
+      );
+      const { userstockstring } = this.props;
+      var userSymbols = userstockstring.map(userstockstring => {
+        return userstockstring.symbol;
+      });
+      axios.get(`https://api.iextrading.com/1.0/stock/market/batch?types=quote,news&symbols=${userSymbols}`
+      )
+        .then(res => {
+          console.log(res.data, "whats in res.data?")
 
-            this.props.userstocklist(p);
-    
-          });
-      })
+          var p = Object.entries(res.data)
+
+					this.props.userstocklist(p);
+					
+			
+						let pieval = []
+						let piestock = ''
+						let pielabels = []
+						let piecolors = []
+						let i = 0;
+						for (i = 0; i < userstockstring.length; i++) {
+							pieval.push(userstockstring[i].quantity * this.props.userstockliststring[i][1].quote.latestPrice)
+							pielabels.push(userstockstring[i].symbol)
+							piecolors.push("#" + ((1 << 24) * Math.random() | 0).toString(16))
+							console.log(pieval, pielabels, piecolors, "whats in pieval?")
+						}
+						this.setState({
+						data: {
+							labels: pielabels,
+							datasets: [{
+								data: pieval,
+								backgroundColor: piecolors,
+								hoverBackgroundColor: piecolors
+							}]
+						}
+					})
+					
+					
+        });
+    })
       .catch(err => {
         console.log(err, "get stocks erro");
       });
@@ -62,35 +88,55 @@ class home extends Component {
     axios.post("/api/checkstock", body).then(res => {
       if (!res.data[0]) {
         axios.post("/api/addstock", body).then(res => {
-          console.log("success!!!");
+					console.log("success!!!");
         });
       }
     });
   }
 
-  render() {
-    const { userstockstring, userstockliststring } = this.props;
-    console.log( userstockstring, userstockliststring, "whats in userstockstring/list?" );
-    console.log(userstockliststring, "after looping");
-
-    if(userstockliststring != null) {
-    let i = 0;
-    for(i=0; i < userstockliststring.length; i++){
-
-    }
+  stockDelete(symbol){
+    console.log(symbol, "stockDelete info symbol")
+   axios.delete('/api/deletestock', {data: {stock_symbol: symbol }} ).then( res => {
+    console.log("Deleted Stock")
+   })
   }
 
-    if (userstockliststring != null) {
-    var displayStock = userstockliststring.map((list,index) => 
-      <ul key = {index} className= "stockBoxContainer">
-      
-       <div className="stockBox"> 
-         {list[1].quote.symbol} ${list[1].quote.latestPrice} {list[1].quote.change}% Shares:{userstockstring[index].quantity}
-        </div>
+  stockUpdate(symbol){
+    const { newquantitystring } = this.props
+    let body = { newquantitystring, symbol }
+    axios.patch('/api/updatestock', body).then( res => {
+      console.log("Updated Stock")
+    })
+  }
 
-      </ul>
-  )
+
+  render() {
+    const { userstockstring, userstockliststring, newquantitystring, newquantity} = this.props;
+    console.log(userstockstring, userstockliststring, "whats in userstockstring/list?");
+
+   
+    var options = {
+      title: {
+        display: true,
+        text: 'Dollar Value of Shares by Symbol'
+      }
     }
+
+    if (userstockliststring != null) {
+      var displayStock = userstockliststring.map((list, index) =>
+        <ul key={index} className="stockBoxContainer">
+
+          <div className="stockBox">
+          <button onClick={() => this.stockDelete(list[1].quote.symbol)}> Delete </button>
+          <button onClick={() => this.stockUpdate(list[1].quote.symbol)}> Update </button> 
+          <input onChange={(e) => newquantity(e.target.value)} />
+            {list[1].quote.symbol} ${list[1].quote.latestPrice} {list[1].quote.change}% Shares:{userstockstring[index].quantity}
+          </div>
+
+        </ul>
+      )
+    }
+
     return (
       <div className="home">
         <TopNav />
@@ -111,8 +157,12 @@ class home extends Component {
         </div>
 
         <div className="main">
-         <div className="viewListContainer">  <div className="viewList">Stock List</div> </div>
-        {displayStock} 
+          <div className="viewListContainer">  <div className="viewList">Stock List</div> </div>
+          {this.state.data != null ?
+            <Pie data= {this.state.data} options={options} /> :
+            ''
+          }
+          {displayStock}
         </div>
 
         <BotNav />
@@ -123,11 +173,13 @@ class home extends Component {
 
 function mapStateToProps(state) {
   if (!state) return {};
-  const { userstockstring, userstockliststring } = state;
+  const { userstockstring, userstockliststring, newquantitystring } = state;
   return {
     userstockstring,
-    userstockliststring
+    userstockliststring,
+    newquantitystring
   };
 }
 
-export default connect(mapStateToProps, { userstock, userstocklist })(home);
+
+export default connect(mapStateToProps, { userstock, userstocklist, newquantity })(home);
