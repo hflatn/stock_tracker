@@ -1,0 +1,22 @@
+@import url("https://fonts.googleapis.com/css?family=Abril+Fatface|Vollkorn");
+
+@media only screen and (max-width: 600px) and (max-height: 900px) {
+
+    .top {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    height: 10%;
+    width: 100%;
+    box-shadow: 0 2px 2px -2px black;
+    background-color: #F4F4F4;
+    margin-bottom: 10px;
+}
+
+.title {
+    font-size: 32px;
+    font-family: 'Abril Flatface';
+    font-weight: 700;
+}
+
+}

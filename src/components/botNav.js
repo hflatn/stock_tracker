@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-
 import book from '../assets/book.png';
 import homeicon from '../assets/home.png';
 import market from '../assets/internet (1).png';
 import history from '../assets/newspaper (1).png';
+import { Link } from 'react-router-dom';
 
 
 class botNav extends Component {
@@ -15,17 +15,16 @@ class botNav extends Component {
 
 
     render(){
-        
+       
         
         return ( 
           
 
                 <div className = 'nav'>
-               
-                <img src = {homeicon} />
-                <img src = {book} />
-                <img src = {history} />
-                <img src = {market} />
+          <div className = 'navboxselect'>   <Link to="/home">   <img src = {homeicon} />  </Link> </div>
+            <div className = 'navbox'>   <img src = {book} /> </div>
+            <div className = 'navbox'>    <img src = {history} /> </div>
+            <div className = 'navbox'>   <img src = {market} /> </div>
 
                 </div>
                 
