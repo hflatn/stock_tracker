@@ -16,47 +16,60 @@ class search extends Component {
             invalid: '',
             stockGraph: '',
             data: null,
+            hmm: ""
         }
     }
-    
+
     componentDidMount() {
 
     }
 
     searchStock() {
-        const { tickerName, tickerQuantity } = this.state;
-        let body = { tickerName, tickerQuantity };
+        const { tickerName } = this.state;
+        let body = { tickerName };
         axios.get(`https://api.iextrading.com/1.0/stock/${tickerName}/chart/1d`).then(res => {
+            axios.get('/api/allhistory').then(res => {
+                console.log(res.data, "all history res.data")
+                if (res.data[0]) {
+                    this.setState({
+                        hmm: "You have searched this before"
+                    })
+                } else {
+                    axios.post('/api/searchhistory', body).then(res => {
+                        console.log("posted")
+                    })
+                }
+
+            })
             let z = Object.entries(res.data)
-            let p =[]
+            let p = []
             let i = 0;
-            for (i=0; i < z.length; i++){ 
-                if((z[i][1].average != 1) && (z[i][1].average != -1)){
+            for (i = 0; i < z.length; i++) {
+                if ((z[i][1].average != 1) && (z[i][1].average != -1)) {
                     p.push(z[i])
-                }}
+                }
+            }
             var datapoints = []
             var datalabels = []
-            for (i=0; i < p.length; i++){
+            for (i = 0; i < p.length; i++) {
                 datalabels.push(p[i][1].label)
                 datapoints.push(p[i][1].average)
             }
-        
+
             console.log(datapoints, "whats datapoints?")
             if (z[0]) {
                 this.setState({
                     invalid: '',
                     stockGraph: z,
-						data: {
-							labels: datalabels,
-							datasets: [{
-                                data: datapoints ,
-                                label: this.state.tickerName,
-								borderColor: "#77C9D4",
-							
-                            },{
-                            pointRadius: 0
-                            }]
-						}
+                    data: {
+                        labels: datalabels,
+                        datasets: [{
+                            data: datapoints,
+                            label: this.state.tickerName,
+                            borderColor: "#77C9D4",
+
+                        }]
+                    }
                 })
                 console.log(z[0][1].label, this.state.data.labels)
 
@@ -78,7 +91,7 @@ class search extends Component {
     render() {
         console.log(this.state.stockGraph, "stockGraph state")
 
-        
+
 
         return (
             <div className="search">
@@ -90,8 +103,9 @@ class search extends Component {
                     <button className="searchbutton" onClick={() => this.searchStock()}> > </button>
                     {this.state.invalid}
                     {this.state.data != null ?
-                    <Line data={this.state.data} /> :
-                    "" }
+                        <Line data={this.state.data} /> :
+                        ""}
+                    {this.state.hmm}
                 </div>
 
                 <BotNav />

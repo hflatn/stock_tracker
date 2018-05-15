@@ -19,7 +19,11 @@ class home extends Component {
 		};
 	}
 
-	componentDidMount() {
+	componentDidMount(){
+		this.getStocks()
+			}
+
+	getStocks() {
 		axios.get("/api/getstocks").then(res => {
 			console.log(res.data, "user stock data");
 			this.props.userstock(res.data);
@@ -46,6 +50,7 @@ class home extends Component {
 					let pielabels = []
 					let piecolors = []
 					let i = 0;
+					console.log(this.props.userstockliststring, userstockstring, "whats the prob")
 					for (i = 0; i < userstockstring.length; i++) {
 						pieval.push(userstockstring[i].quantity * this.props.userstockliststring[i][1].quote.latestPrice)
 						pielabels.push(userstockstring[i].symbol)
@@ -90,20 +95,19 @@ class home extends Component {
 			let z = Object.entries(res.data)
 			console.log(z, "addstock res.data")
 			if (z[0]) {
-				axios.post("/api/checkstock", body).then(res => {
-					if (!res.data[0]) {
 						axios.post("/api/addstock", body).then(res => {
-							this.setState({
-								invalid: ""
-							})
+							if(res.data){
+								this.getStocks()
+							// this.setState({
+							// 	invalid: ""
+							// })
 							console.log("success!!!");
+						} else {
+							this.setState({
+								invalid: "Stock Already Listed"
+							})
+						}
 						});
-					} else {
-						this.setState({
-							invalid: "Ticker Symbol Already Listed"
-						})
-					}
-				});
 			}
 			else {
 				this.setState({
@@ -117,6 +121,7 @@ class home extends Component {
 		console.log(symbol, "stockDelete info symbol")
 		axios.delete('/api/deletestock', { data: { stock_symbol: symbol } }).then(res => {
 			console.log("Deleted Stock")
+			window.location.reload()
 		})
 	}
 
@@ -125,6 +130,7 @@ class home extends Component {
 		let body = { newquantitystring, symbol }
 		axios.patch('/api/updatestock', body).then(res => {
 			console.log("Updated Stock")
+			this.getStocks()
 		})
 	}
 
