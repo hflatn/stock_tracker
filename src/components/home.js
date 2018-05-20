@@ -1,11 +1,9 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import axios from "axios";
-import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
-import IconButton from "material-ui/IconButton";
 import BotNav from "./botNav.js";
 import TopNav from "./topNav.js";
-import { userstock, userstocklist, newquantity } from "./../reducer.js";
+import { userstock, userstocklist, newquantity, piedata } from "./../reducer.js";
 import { Pie } from 'react-chartjs-2';
 
 class home extends Component {
@@ -19,9 +17,11 @@ class home extends Component {
 		};
 	}
 
-	componentDidMount(){
-		this.getStocks()
-			}
+	componentDidMount() {
+		if (!this.props.userstockliststring) {
+			this.getStocks()
+		}
+	}
 
 	getStocks() {
 		axios.get("/api/getstocks").then(res => {
@@ -54,19 +54,18 @@ class home extends Component {
 					for (i = 0; i < userstockstring.length; i++) {
 						pieval.push(userstockstring[i].quantity * this.props.userstockliststring[i][1].quote.latestPrice)
 						pielabels.push(userstockstring[i].symbol)
-						piecolors.push("#" + ((1 << 24) * Math.random() | 0).toString(16))
+						piecolors.push("#" + Math.floor(Math.random() * 16777215).toString(16))
 						console.log(pieval, pielabels, piecolors, "whats in pieval?")
 					}
-					this.setState({
-						data: {
-							labels: pielabels,
-							datasets: [{
-								data: pieval,
-								backgroundColor: piecolors,
-								hoverBackgroundColor: piecolors
-							}]
-						}
+					this.props.piedata({
+						labels: pielabels,
+						datasets: [{
+							data: pieval,
+							backgroundColor: piecolors,
+							hoverBackgroundColor: piecolors
+						}]
 					})
+
 
 
 				});
@@ -95,19 +94,19 @@ class home extends Component {
 			let z = Object.entries(res.data)
 			console.log(z, "addstock res.data")
 			if (z[0]) {
-						axios.post("/api/addstock", body).then(res => {
-							if(res.data){
-								this.getStocks()
-							// this.setState({
-							// 	invalid: ""
-							// })
-							console.log("success!!!");
-						} else {
-							this.setState({
-								invalid: "Stock Already Listed"
-							})
-						}
-						});
+				axios.post("/api/addstock", body).then(res => {
+					if (res.data) {
+						this.getStocks()
+						// this.setState({
+						// 	invalid: ""
+						// })
+						console.log("success!!!");
+					} else {
+						this.setState({
+							invalid: "Stock Already Listed"
+						})
+					}
+				});
 			}
 			else {
 				this.setState({
@@ -137,7 +136,8 @@ class home extends Component {
 
 	render() {
 		const { userstockstring, userstockliststring, newquantitystring, newquantity } = this.props;
-		console.log(this.props.match.url, "whats params?")
+		console.log(this.props, "whats params?")
+
 
 		var options = {
 			title: {
@@ -163,28 +163,28 @@ class home extends Component {
 
 		return (
 			<div className="home">
-			<div className="main">
-				<TopNav />
-				
-				<div className="tip">
-					<button className="addbutton" onClick={() => this.addStock()}> +
+				<div className="main">
+					<TopNav />
+
+					<div className="tip">
+						<button className="addbutton" onClick={() => this.addStock()}> +
           </button>
-					<input
-						className="addstock"
-						placeholder="Symbol"
-						onChange={e => this.tickerListener(e.target.value)}
-					/>
-					<input
-						className="addstock"
-						placeholder="Quantity"
-						onChange={e => this.tickerQuantity(e.target.value)}
-					/>
-				</div>
-				{this.state.invalid}
-				
+						<input
+							className="addstock"
+							placeholder="Symbol"
+							onChange={e => this.tickerListener(e.target.value)}
+						/>
+						<input
+							className="addstock"
+							placeholder="Quantity"
+							onChange={e => this.tickerQuantity(e.target.value)}
+						/>
+					</div>
+					{this.state.invalid}
+
 					<div className="viewListContainer">  <div className="viewList">Stock List</div> </div>
-					{this.state.data != null ?
-						<Pie data={this.state.data} options={options} /> :
+					{this.props.piedatastring != null ?
+						<Pie data={this.props.piedatastring} options={options} /> :
 						''
 					}
 					{displayStock}
@@ -198,13 +198,14 @@ class home extends Component {
 
 function mapStateToProps(state) {
 	if (!state) return {};
-	const { userstockstring, userstockliststring, newquantitystring } = state;
+	const { userstockstring, userstockliststring, newquantitystring, piedatastring } = state;
 	return {
 		userstockstring,
 		userstockliststring,
-		newquantitystring
+		newquantitystring,
+		piedatastring
 	};
 }
 
 
-export default connect(mapStateToProps, { userstock, userstocklist, newquantity })(home);
+export default connect(mapStateToProps, { userstock, userstocklist, newquantity, piedata })(home);

@@ -68,7 +68,6 @@ app.get('/auth/callback', passport.authenticate('auth0', {
 
 app.get('/api/getstocks', controller.getstocks)
 app.get('/api/allhistory', controller.allhistory)
-app.get('/api/signout', controller.signout);
 app.post('/api/addstock', controller.addstock)
 app.post('/api/searchhistory', controller.searchhistory)
 app.patch('/api/updatestock', controller.updatestock)

@@ -81,11 +81,5 @@ module.exports = {
             (console.log(err, "all history"))
             res.status(500).send(err)
         })
-    },
-
-    signout: (req, res, next) => {
-        const { session } = req;
-        session.destroy()
-        res.status(200).send(req.session);
     }
 }
