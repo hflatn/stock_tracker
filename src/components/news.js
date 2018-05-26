@@ -4,6 +4,9 @@ import axios from "axios";
 import BotNav from "./botNav.js";
 import TopNav from "./topNav.js";
 import { userstock } from "./../reducer.js";
+import SeekingAlpha from '../assets/Seeking-Alpha.jpg';
+import CNBC from '../assets/CNBC.png';
+import BusinessWire from '../assets/business_wire.jpg';
 
 class news extends Component {
     constructor(props) {
@@ -78,9 +81,17 @@ class news extends Component {
             var displayNews = newsInfo.map((list, index) =>
                 <ul key={index}>
                     <div className="stockBox">
-                        <title> {list.headline} </title>
-                        <p> {list.summary} </p>
-                        <span> {list.source} </span>
+                        {list.source == "SeekingAlpha" ?
+                            <img className="imgsource" src={SeekingAlpha} /> :
+                            ""}
+                        {list.source == "Business Wire" ?
+                            <img className="imgsource" src={BusinessWire} /> :
+                            ""}
+                        {list.source == "CNBC" ?
+                            <img className="imgsource" src={CNBC} /> :
+                            ""}
+
+                        <p> {list.headline} </p>
                         <a href={list.url}> Read more </a>
 
                     </div>

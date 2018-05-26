@@ -87,6 +87,8 @@ class home extends Component {
 		});
 	}
 
+	
+
 	addStock() {
 		const { tickerName, tickerQuantity } = this.state;
 		let body = { tickerName, tickerQuantity };

@@ -35,48 +35,48 @@ class search extends Component {
 
 
 
-                if (g == '1d' ) {
-                if ((i % 15 == 0) && (z[i][1].average != 1) && (z[i][1].average != -1) || (i == z.length -1)) {
+                if (g === '1d' ) {
+                if ((i % 15 === 0) && (z[i][1].average !== 1) && (z[i][1].average !== -1) || (i === z.length -1)) {
                     p.push(z[i])
                 }
             }
-            else if (g == '1m'){
+            else if (g === '1m'){
                     p.push(z[i])
                 
             }
 
-            else if (g == '3m'){
-                if ((i % 3 == 0) || (i == z.length -1)) {
+            else if (g === '3m'){
+                if ((i % 3 === 0) || (i === z.length -1)) {
                     p.push(z[i])
                 }
             }
 
-            else if (g == '6m'){
-                if ((i % 6 == 0) || (i == z.length -1)) {
+            else if (g === '6m'){
+                if ((i % 6 === 0) || (i === z.length -1)) {
                     p.push(z[i])
                 }
             }
 
-            else if (g == '1y'){
-                if ((i % 12 == 0) || (i == z.length -1)) {
+            else if (g === '1y'){
+                if ((i % 12 === 0) || (i === z.length -1)) {
                     p.push(z[i])
                 }
             }
 
-            else if (g == '2y'){
-                if ((i % 25 == 0) || (i == z.length -1)) {
+            else if (g === '2y'){
+                if ((i % 25 === 0) || (i === z.length -1)) {
                     p.push(z[i])
                 }
             }
 
-            else if (g == '5y'){
-                if ((i % 62 == 0) || (i == z.length -1)) {
+            else if (g === '5y'){
+                if ((i % 62 === 0) || (i === z.length -1)) {
                     p.push(z[i])
                 }
             }
 
-            else if (g == 'ytd'){
-                if ((i % 4 == 0) || (i == z.length -1)) {
+            else if (g === 'ytd'){
+                if ((i % 4 === 0) || (i === z.length -1)) {
                     p.push(z[i])
                 }
             }
@@ -89,7 +89,7 @@ class search extends Component {
             var datapoints = []
             var datalabels = []
             
-            if ( g == '1d'){
+            if ( g === '1d'){
             for (i = 0; i < p.length; i++) {
                 datalabels.push(p[i][1].label)
                 datapoints.push(p[i][1].average)
