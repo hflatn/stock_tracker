@@ -1,12 +1,19 @@
-@import url("https://fonts.googleapis.com/css?family=Abril+Fatface|Vollkorn");
 
 @media only screen and (max-width: 600px) and (max-height: 900px) {
 
+    
     .search {
         height: 100vh;
         width: 100vw;
 
+                .invalid{
+                    height: 4vh;
+                    
+                }
+
         .main {
+            display: flex;
+            justify-content: center;
             flex-wrap: wrap;
             overflow: scroll;
             height: 90%;
@@ -15,21 +22,65 @@
         }
 
 .searchinput {
-    height: 10%;
+    height: 6%;
     width: 33%;
 }
 
 .searchbutton{
-    height: 10%;
+    height: 7%;
     width:10%;
     background-color: #77C9D4;
     color: black;
 }
 
+
+
 .stocktime{
    background-color: #77C9D4;
    padding: 10px;
    border: 1px solid #77C9D4;
+}
+.stocktime:focus{
+    padding: 10px;
+    border: 1px solid #3db2c1;
+    background-color: #3db2c1;
+ }
+
+.stockdetailsC {
+    height: 33%;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.stockdetailsCC { 
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    width: 100%
+}
+
+.stockdetailsleft {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    height: 50%;
+    width: 50%;
+}
+.stockdetailsright {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    height: 50%;
+    width: 65%;
+}
+
+
+span {
+    display:flex;
+    justify-content: center;
+    height: 10%;
+    width: 100%;
+    margin: 1px;
 }
 
 

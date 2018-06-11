@@ -3,21 +3,23 @@ import { connect } from "react-redux";
 import axios from "axios";
 import BotNav from "./botNav.js";
 import TopNav from "./topNav.js";
-import { userstock, userstocklist, newquantity, piedata } from "./../reducer.js";
+import { userstock, userstocklist, newquantity, newsymbol, piedata, url, resets } from "./../reducer.js";
 import { Pie } from 'react-chartjs-2';
+import { Link } from 'react-router-dom';
+import binoculars from '../assets/binoculars.png';
+import Arrow from 'react-icons/lib/fa/arrow-right.js';
 
 class home extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			tickerName: "",
-			tickerQuantity: [],
 			data: null,
 			invalid: ''
 		};
 	}
 
 	componentDidMount() {
+		this.props.url(this.props.location)
 		if (!this.props.userstockliststring) {
 			this.getStocks()
 		}
@@ -25,12 +27,9 @@ class home extends Component {
 
 	getStocks() {
 		axios.get("/api/getstocks").then(res => {
-			console.log(res.data, "user stock data");
+			
 			this.props.userstock(res.data);
-			console.log(
-				this.props.userstockstring,
-				"whats in userstockstring didmount?"
-			);
+			;
 			const { userstockstring } = this.props;
 			var userSymbols = userstockstring.map(userstockstring => {
 				return userstockstring.symbol;
@@ -57,6 +56,7 @@ class home extends Component {
 						piecolors.push("#" + Math.floor(Math.random() * 16777215).toString(16))
 						console.log(pieval, pielabels, piecolors, "whats in pieval?")
 					}
+					
 					this.props.piedata({
 						labels: pielabels,
 						datasets: [{
@@ -75,26 +75,17 @@ class home extends Component {
 			});
 	}
 
-	tickerListener(e) {
-		this.setState({
-			tickerName: e.toUpperCase()
-		});
-	}
 
-	tickerQuantity(e) {
-		this.setState({
-			tickerQuantity: e
-		});
-	}
 
-	
 
 	addStock() {
-		const { tickerName, tickerQuantity } = this.state;
-		let body = { tickerName, tickerQuantity };
-		axios.get(`https://api.iextrading.com/1.0/stock/market/batch?types=quote&symbols=${tickerName}`).then(res => {
+		const { newsymbolstring, newquantitystring } = this.props;
+		let body = { newsymbolstring, newquantitystring };
+		console.log(newsymbolstring, newquantitystring, "propsssssssssssssssssssssssssssssss")
+		axios.get(`https://api.iextrading.com/1.0/stock/market/batch?types=quote&symbols=${newsymbolstring}`).then(res => {
 			let z = Object.entries(res.data)
 			console.log(z, "addstock res.data")
+			this.props.resets()
 			if (z[0]) {
 				axios.post("/api/addstock", body).then(res => {
 					if (res.data) {
@@ -118,28 +109,15 @@ class home extends Component {
 		})
 	}
 
-	stockDelete(symbol) {
-		console.log(symbol, "stockDelete info symbol")
-		axios.delete('/api/deletestock', { data: { stock_symbol: symbol } }).then(res => {
-			console.log("Deleted Stock")
-			window.location.reload()
-		})
-	}
+	
 
-	stockUpdate(symbol) {
-		const { newquantitystring } = this.props
-		let body = { newquantitystring, symbol }
-		axios.patch('/api/updatestock', body).then(res => {
-			console.log("Updated Stock")
-			this.getStocks()
-		})
-	}
+	
 
 
 	render() {
-		const { userstockstring, userstockliststring, newquantitystring, newquantity } = this.props;
+		const { userstockstring, userstockliststring, newquantitystring, newquantity, newsymbol, newsymbolstring } = this.props;
 		console.log(this.props, "whats params?")
-
+		console.log(userstockliststring)
 
 		var options = {
 			title: {
@@ -153,10 +131,31 @@ class home extends Component {
 				<ul key={index} className="stockBoxContainer">
 
 					<div className="stockBox">
-						<button onClick={() => this.stockDelete(list[1].quote.symbol)}> Delete </button>
-						<button onClick={() => this.stockUpdate(list[1].quote.symbol)}> Update </button>
-						<input onChange={(e) => newquantity(e.target.value)} />
-						{list[1].quote.symbol} ${list[1].quote.latestPrice} {list[1].quote.change}% Shares:{userstockstring[index].quantity}
+						
+
+						<div className="stockBoxLeft">
+							<h1> {list[1].quote.symbol} </h1>
+							<h2> {list[1].quote.companyName} </h2>
+						</div>{/* <button onClick={() => this.stockDelete(list[1].quote.symbol)}> Delete </button> */}
+						{/* <button onClick={() => this.stockUpdate(list[1].quote.symbol)}> Update </button> */}
+						{/* <input onChange={(e) => newquantity(e.target.value)} /> */}
+
+						<div className="stockBoxRight">
+							<span className='latestPrice'> ${list[1].quote.latestPrice} </span>
+							{list[1].quote.change > 0.00 ?
+							<span className='latestChangePos'> {list[1].quote.change}%  </span> :
+							<span className='latestChangeNeg'> {list[1].quote.change}%  </span>
+							}
+						</div>
+
+
+						<Link to={`/usersymbol/${list[1].quote.symbol}`} className='stockBoxBottom'>	
+					
+
+							<span className='MoreStats'> More Stats </span>
+							<div> <Arrow size={15}/> </div>
+				
+						</Link>
 					</div>
 
 				</ul>
@@ -174,21 +173,24 @@ class home extends Component {
 						<input
 							className="addstock"
 							placeholder="Symbol"
-							onChange={e => this.tickerListener(e.target.value)}
+							onChange={e => newsymbol(e.target.value.toUpperCase())}
+							value={newsymbolstring}
 						/>
 						<input
 							className="addstock"
 							placeholder="Quantity"
-							onChange={e => this.tickerQuantity(e.target.value)}
+							onChange={e => newquantity(e.target.value)}
+							value={newquantitystring}
 						/>
 					</div>
 					{this.state.invalid}
 
-					<div className="viewListContainer">  <div className="viewList">Stock List</div> </div>
+
 					{this.props.piedatastring != null ?
 						<Pie data={this.props.piedatastring} options={options} /> :
 						''
 					}
+					<div className="viewListContainer"> <img src={binoculars} /> <div className="viewList"> Watch List </div> </div>
 					{displayStock}
 				</div>
 
@@ -200,14 +202,16 @@ class home extends Component {
 
 function mapStateToProps(state) {
 	if (!state) return {};
-	const { userstockstring, userstockliststring, newquantitystring, piedatastring } = state;
+	const { userstockstring, userstockliststring, newquantitystring, piedatastring, newsymbolstring, urlstring } = state;
 	return {
 		userstockstring,
 		userstockliststring,
 		newquantitystring,
-		piedatastring
+		piedatastring,
+		urlstring,
+		newsymbolstring
 	};
 }
 
 
-export default connect(mapStateToProps, { userstock, userstocklist, newquantity, piedata })(home);
+export default connect(mapStateToProps, { userstock, userstocklist, newquantity, newsymbol, piedata, url, resets })(home);

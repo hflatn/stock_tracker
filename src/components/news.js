@@ -3,10 +3,11 @@ import { connect } from "react-redux";
 import axios from "axios";
 import BotNav from "./botNav.js";
 import TopNav from "./topNav.js";
-import { userstock } from "./../reducer.js";
+import { userstock, url } from "./../reducer.js";
 import SeekingAlpha from '../assets/Seeking-Alpha.jpg';
 import CNBC from '../assets/CNBC.png';
 import BusinessWire from '../assets/business_wire.jpg';
+import Arrow from 'react-icons/lib/fa/arrow-right.js'
 
 class news extends Component {
     constructor(props) {
@@ -17,6 +18,7 @@ class news extends Component {
     }
 
     componentDidMount() {
+        this.props.url(this.props.location)
         const { userstockstring } = this.props
         if (!userstockstring) {
             axios.get("/api/getstocks").then(res => {
@@ -79,7 +81,7 @@ class news extends Component {
         console.log(this.state.newsInfo, "whats in newsinfo?")
         if (this.state.newsInfo != null) {
             var displayNews = newsInfo.map((list, index) =>
-                <ul key={index}>
+                <ul key={index} className='NewsContainer'>
                     <div className="stockBox">
                         {list.source == "SeekingAlpha" ?
                             <img className="imgsource" src={SeekingAlpha} /> :
@@ -91,8 +93,11 @@ class news extends Component {
                             <img className="imgsource" src={CNBC} /> :
                             ""}
 
-                        <p> {list.headline} </p>
-                        <a href={list.url}> Read more </a>
+                        <p className='HeadlineContainer'> {list.headline} </p>
+                        <a className='ReadMoreContainer' href={list.url}> 
+                       <span className='ReadMore'> Read more </span>
+                       <div> <Arrow size={15}/> </div>
+                         </a>
 
                     </div>
                 </ul>
@@ -115,11 +120,11 @@ class news extends Component {
 
 function mapStateToProps(state) {
     if (!state) return {};
-    const { userstockstring } = state;
+    const { userstockstring, url } = state;
     return {
-        userstockstring
+        userstockstring, url
     };
 }
 
 
-export default connect(mapStateToProps, { userstock })(news);
+export default connect(mapStateToProps, { userstock, url })(news);

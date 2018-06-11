@@ -3,24 +3,30 @@ import { connect } from "react-redux";
 import axios from "axios";
 import BotNav from "./botNav.js";
 import TopNav from "./topNav.js";
-import { userstock, userstocklist, newquantity, url } from "./../reducer.js";
+import { userstock, userstocklist, newquantity, url, resets } from "./../reducer.js";
 import { Line } from 'react-chartjs-2';
-import Arrow from 'react-icons/lib/fa/arrow-right.js';
+import Delete from 'react-icons/lib/fa/archive';
+import Update from 'react-icons/lib/fa/upload.js';
 
-class search extends Component {
+
+class userSymbol extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            tickerName: '',
-            invalid: null,
+            tickerName: this.props.match.params.symbol,
+            invalid: '',
             stockGraph: '',
             data: null,
-            tickerQuote: 'N/A'
+            tickerQuote: 'N/A',
+            shares: ''
         }
     }
 
     componentDidMount() {
         this.props.url(this.props.location)
+        console.log(this.props.userstockliststring, " whats userstockliststring")
+        console.log(this.props.match.params.symbol, 'whats this.props')
+        this.searchStock('1d')
     }
 
     searchStock(g) {
@@ -32,18 +38,14 @@ class search extends Component {
             let newres = Object.entries(res.data)
             console.log(newres, "whats res.data for quote")
 
-            if(newres[0]){
+
             this.setState({
                 tickerQuote: newres[0][1].quote
             })
-        } else {
-            this.setState({
-                invalid: 'Invalid Symbol'
-        })}
         })
 
         axios.get(`https://api.iextrading.com/1.0/stock/${tickerName}/chart/${g}`).then(res => {
-            console.log(res.data, "whats res.data of 2nd axios request")
+
             let z = Object.entries(res.data)
             let p = []
             let i = 0;
@@ -63,37 +65,37 @@ class search extends Component {
                 }
 
                 else if (g === '3m') {
-                    if ((i % 1 === 0) || (i === z.length - 1)) {
+                    if ((i % 1 === 0) && (i !== z.length - 1)) {
                         p.push(z[i])
                     }
                 }
 
                 else if (g === '6m') {
-                    if ((i % 1 === 0) || (i === z.length - 1)) {
+                    if ((i % 1 === 0) && (i !== z.length - 1)) {
                         p.push(z[i])
                     }
                 }
 
                 else if (g === '1y') {
-                    if ((i % 2 === 0) || (i === z.length - 1)) {
+                    if ((i % 2 === 0) && (i !== z.length - 1)) {
                         p.push(z[i])
                     }
                 }
 
                 else if (g === '2y') {
-                    if ((i % 4 === 0) || (i === z.length - 1)) {
+                    if ((i % 4 === 0) && (i !== z.length - 1)) {
                         p.push(z[i])
                     }
                 }
 
                 else if (g === '5y') {
-                    if ((i % 10 === 0) || (i === z.length - 1)) {
+                    if ((i % 10 === 0) && (i !== z.length - 1)) {
                         p.push(z[i])
                     }
                 }
 
                 else if (g === 'ytd') {
-                    if ((i % 1 === 0) || (i === z.length - 1)) {
+                    if ((i !== z.length - 1)) {
                         p.push(z[i])
                     }
                 }
@@ -120,7 +122,6 @@ class search extends Component {
             }
             console.log(p, "whats p?")
             console.log(datapoints, "whats datapoints?")
-            console.log(z, "whats z?")
             if (z[0]) {
                 let posorneg = "black"
                 if (datapoints[0] < datapoints[datapoints.length - 1]) {
@@ -154,18 +155,66 @@ class search extends Component {
         })
     }
 
+    getStocks() {
+		axios.get("/api/getstocks").then(res => {
+			console.log(res.data, "user stock data");
+			this.props.userstock(res.data);
+			console.log(
+				this.props.userstockstring,
+				"whats in userstockstring didmount?"
+            )
+        }
+    )}
+    
+
+    stockDelete(symbol) {
+		console.log(symbol, "stockDelete info symbol")
+		axios.delete('/api/deletestock', { data: { stock_symbol: symbol } }).then(res => {
+            console.log("Deleted Stock")
+            this.props.history.push('/home')
+            window.location.reload()
+		})
+    }
+    
+    stockUpdate(symbol) {
+		const { newquantitystring, newquantity} = this.props
+		let body = { newquantitystring, symbol }
+		axios.patch('/api/updatestock', body).then(res => {
+			console.log("Updated Stock")
+            this.getStocks()
+            this.props.resets()
+           
+		})
+	}
+
     tickerListener(e) {
         this.setState({
             tickerName: e.toUpperCase()
         });
     }
 
+    handleShares(e){
+        let input = e.target.value
+        this.setState({
+           shares: input
+        })
+    }
+
 
     render() {
         const { tickerQuote, invalid, stockGraph, data } = this.state
+        const {userstockstring, newquantity} = this.props
         console.log(stockGraph, "stockGraph state")
-        console.log(invalid, "whats invalid?")
+        console.log(userstockstring, "whats userstockstring")
         console.log(tickerQuote, "whats tickerquote")
+        var shares = ''
+        if(userstockstring){
+        for(let i=0; i < userstockstring.length; i++){
+            if(userstockstring[i].symbol === this.props.match.params.symbol ){
+                shares = userstockstring[i].quantity
+            }
+        }
+    }
 
 
         var oldData = {
@@ -186,12 +235,13 @@ class search extends Component {
                 <div className="main">
                     <TopNav />
 
+                <div className='ButtonContainer'>
+                <button className='StockUpdate' onClick={() => this.stockUpdate(this.props.match.params.symbol)}> Update <Update size={15}/> </button>
+                <input className='UserSymbolQuantityInput' placeholder="Shares" value={this.props.newquantitystring} onChange={(e) => newquantity(e.target.value)} />
+                    <button className='StockDelete' onClick={() => this.stockDelete(this.props.match.params.symbol) } > Remove <Delete color={'white'} size={15}/> </button>
+                    </div>
                     
-                    
-                    <input className="searchinput" placeholder="Symbol"
-                        onChange={e => this.tickerListener(e.target.value)} />
-                    <button className="searchbutton" onClick={() => this.searchStock("1d")}> <Arrow size={12}/> </button>
-                    <span className='invalid'> {invalid} </span> 
+                    {invalid}
                     {data != null ?
                         <Line data={data} />
                         :
@@ -222,8 +272,8 @@ class search extends Component {
                                 </div>
                             </div>
                             : ''}
-                    </div>
-
+                    </div> 
+                            <div className='shares'> Shares: {shares}  </div>
 
                 </div>
 
@@ -245,4 +295,4 @@ function mapStateToProps(state) {
 }
 
 
-export default connect(mapStateToProps, { userstock, userstocklist, newquantity, url })(search);
+export default connect(mapStateToProps, { userstock, userstocklist, newquantity, url, resets })(userSymbol);

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import menu from '../assets/menu.png';
 import axios from 'axios';
+import Sign from 'react-icons/lib/fa/sign-out';
 
 class topNav extends Component {
     constructor(props){
@@ -16,9 +17,9 @@ class topNav extends Component {
         return ( 
 
                 <div className = 'top' >
-
-                 <a href="https://first-tenny.auth0.com/v2/logout?returnTo=http://localhost:3000/#/">   <img src = {menu} /> </a>
-                <span className = 'title' > Stock Tracker </span>
+                <p className = 'title' > Stock Tracker </p>
+                
+                <div className='logout'> <a href="https://first-tenny.auth0.com/v2/logout?returnTo=http://localhost:3000/#/">   <Sign color={'black'} size={35} /> </a> </div>
                
 
                 </div>

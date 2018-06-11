@@ -1,0 +1,47 @@
+@media only screen and (max-width: 600px) and (max-height: 900px) {
+
+
+.shares{
+
+    margin-top: -15vh;
+    
+}
+
+.ButtonContainer{
+ 
+
+.StockDelete{
+    height: 85%;
+    border: none;
+	background-color: #c0392b;
+	color: #fff;
+	cursor: pointer;
+	border-radius: 5px;
+	box-shadow: 0 0 20px 0 rgba(0,0,0,.3)
+}
+
+.StockUpdate{
+    height: 85%;
+    border: none;
+	background-color: #77d4b1;
+	color: #fff;
+	cursor: pointer;
+	border-radius: 5px;
+	box-shadow: 0 0 20px 0 rgba(0,0,0,.2)
+}
+
+.UserSymbolQuantityInput{
+    height: 95%;
+    border: transparent;
+    margin: 0px 10px;
+    border-radius: 5px;
+    font-size: 14epx;
+    font-family: 'Vollkorn'
+}
+
+.UserSymbolQuantityInput:focus{
+  
+    outline: #77C9D4 2px solid;
+}
+}
+}

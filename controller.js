@@ -2,8 +2,8 @@ module.exports = {
 
     addstock: (req, res) => {
         const db = req.app.get('db');
-        const { tickerName, tickerQuantity } = req.body
-        db.add_stock([req.session.passport.user, tickerName, tickerQuantity])
+        const { newsymbolstring, newquantitystring } = req.body
+        db.add_stock([req.session.passport.user, newsymbolstring, newquantitystring])
         .then(([stock]) => { 
             console.log(stock,"addstock res")
             res.status(200).send(stock)}
