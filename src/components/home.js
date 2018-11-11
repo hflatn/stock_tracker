@@ -58,7 +58,7 @@ class home extends Component {
 					}
 					
 					this.props.piedata({
-						labels: pielabels,
+						labels:  pielabels,
 						datasets: [{
 							data: pieval,
 							backgroundColor: piecolors,

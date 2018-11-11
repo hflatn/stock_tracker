@@ -29,10 +29,17 @@ class userSymbol extends Component {
         this.searchStock('1d')
     }
 
+    componentWillReceiveProps(nextProps){
+        if(this.props.userstockliststring !== nextProps.userstockliststring){
+      
+       
+            console.log("PROPS RECIEVED")
+    }
+}
+
     searchStock(g) {
         console.log(g, "whats g?")
         const { tickerName } = this.state;
-        let body = { tickerName };
         console.log(tickerName)
         axios.get(`https://api.iextrading.com/1.0/stock/market/batch?types=quote&symbols=${tickerName}`).then(res => {
             let newres = Object.entries(res.data)
@@ -212,6 +219,8 @@ class userSymbol extends Component {
         for(let i=0; i < userstockstring.length; i++){
             if(userstockstring[i].symbol === this.props.match.params.symbol ){
                 shares = userstockstring[i].quantity
+                console.log(userstockstring[i].quantity)
+                console.log(shares,"whats shares")
             }
         }
     }
